@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit Medical Record #{{ form.instance.record_id|default:form.instance.id }}{% else %}Add Medical Record{% endif %} | MediAnalytics{% endblock %}
+
+{% block page_title %}{% if form.instance.pk %}Edit Diagnostic Record{% else %}New Medical Record Entry{% endif %}{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}" class="text-decoration-none text-muted">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'medical_records:list' %}" class="text-decoration-none text-muted">Medical Records</a></li>
+<li class="breadcrumb-item active" aria-current="page">{% if form.instance.pk %}Edit{% else %}New Record{% endif %}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-10 col-xl-9">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-teal bg-opacity-10 text-teal p-2 rounded-3" style="background-color: #e6fffa; color: #2c7a7b;">
+                        <i class="bi bi-file-earmark-plus-fill fs-5"></i>
+                    </span>
+                    <div>
+                        <h5 class="fw-bold mb-0 text-dark">{% if form.instance.pk %}Edit Clinical Record #{{ form.instance.record_id|default:form.instance.id }}{% else %}Record Clinical Diagnostics &amp; Vitals{% endif %}</h5>
+                        <p class="text-muted small mb-0">Record laboratory metrics, diagnostic values, and patient outcomes.</p>
+                    </div>
+                </div>
+                <a href="{% url 'medical_records:list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-x-lg me-1"></i> Cancel
+                </a>
+            </div>
+
+            <div class="card-body p-4">
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
+                    {% for error in form.non_field_errors %}
+                        <div><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}</div>
+                    {% endfor %}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endif %}
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        {% for field in form %}
+                            <div class="{% if field.name == 'notes' or field.name == 'diagnosis' or field.name == 'remarks' or field.name == 'description' %}col-12{% elif field.name == 'patient' or field.name == 'test_date' or field.name == 'outcome' %}col-12 col-md-6{% else %}col-12 col-md-4{% endif %} mb-2">
+                                <label for="{{ field.id_for_label }}" class="form-label small fw-semibold text-secondary mb-1">
+                                    {{ field.label }}
+                                    {% if field.field.required %}
+                                        <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>
+
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted">
+                                        {% if 'patient' in field.name %}
+                                            <i class="bi bi-person"></i>
+                                        {% elif 'date' in field.name %}
+                                            <i class="bi bi-calendar-check"></i>
+                                        {% elif 'heart' in field.name or 'pulse' in field.name %}
+                                            <i class="bi bi-heart-pulse text-danger"></i>
+                                        {% elif 'pressure' in field.name or 'bp' in field.name %}
+                                            <i class="bi bi-speedometer2 text-primary"></i>
+                                        {% elif 'glucose' in field.name or 'sugar' in field.name %}
+                                            <i class="bi bi-droplet text-warning"></i>
+                                        {% elif 'cholesterol' in field.name %}
+                                            <i class="bi bi-activity text-info"></i>
+                                        {% elif 'outcome' in field.name %}
+                                            <i class="bi bi-clipboard2-check text-success"></i>
+                                        {% else %}
+                                            <i class="bi bi-card-text"></i>
+                                        {% endif %}
+                                    </span>
+                                    {{ field }}
+                                </div>
+
+                                {% if field.help_text %}
+                                <div class="form-text small text-muted mt-1">{{ field.help_text }}</div>
+                                {% endif %}
+
+                                {% if field.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in field.errors %}
+                                        <div><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <hr class="my-4 text-muted">
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'medical_records:list' %}" class="btn btn-light px-4">Cancel</a>
+                        <button type="submit" class="btn btn-teal px-4 d-flex align-items-center gap-2 text-white shadow-sm" style="background-color: var(--teal-secondary); border-color: var(--teal-secondary);">
+                            <i class="bi bi-check2-circle"></i>
+                            <span>Save Medical Record</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputs = document.querySelectorAll('.card-body form input:not([type=checkbox]):not([type=radio]), .card-body form select, .card-body form textarea');
+        inputs.forEach(function(input) {
+            if (input.tagName === 'SELECT') {
+                input.classList.add('form-select');
+            } else {
+                input.classList.add('form-control');
+            }
+        });
+    });
+</script>
+{% endblock %}

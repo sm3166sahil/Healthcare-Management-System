@@ -1,0 +1,293 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FDS Syllabus Coverage Matrix - MediAnalytics{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-navy mb-1"><i class="bi bi-mortarboard text-teal me-2"></i>FDS Syllabus Coverage & Viva Defense Guide</h2>
+            <p class="text-muted mb-0">Course: Fundamentals of Data Science (21CSS202T) – Comprehensive Academic Unit Mapping Matrix</p>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i> Print Syllabus Defense Sheet
+        </button>
+    </div>
+
+    <!-- Syllabus Unit Quick Tabs Summary -->
+    <div class="row g-3 mb-4">
+        <div class="col-md">
+            <div class="stat-card primary">
+                <div class="stat-label">Unit 1: NumPy</div>
+                <div class="stat-value fs-5 text-primary">Vectors & Matrices</div>
+                <small class="text-muted"><code>analytics/numpy_analysis.py</code></small>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="stat-card info">
+                <div class="stat-label">Unit 2: Python OOP</div>
+                <div class="stat-value fs-5 text-info">JSON, RegEx, Tests</div>
+                <small class="text-muted"><code>analytics/json_regex_view</code></small>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="stat-card success">
+                <div class="stat-label">Unit 3: Django</div>
+                <div class="stat-value fs-5 text-success">MVT, ORM, Auth</div>
+                <small class="text-muted"><code>config/settings.py</code></small>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="stat-card warning">
+                <div class="stat-label">Unit 4: Pandas</div>
+                <div class="stat-value fs-5 text-warning">DataFrames & Cleaning</div>
+                <small class="text-muted"><code>analytics/data_cleaning.py</code></small>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="stat-card danger">
+                <div class="stat-label">Unit 5: Visualization</div>
+                <div class="stat-value fs-5 text-danger">Matplotlib & Seaborn</div>
+                <small class="text-muted"><code>analytics/visualization.py</code></small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complete 5-Unit Academic Coverage Table -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white border-bottom py-3">
+            <h5 class="card-title mb-0 fw-bold text-navy">
+                <i class="bi bi-card-checklist text-primary me-2"></i>Comprehensive Unit-by-Unit Implementation Matrix
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">FDS Unit</th>
+                            <th>Curriculum Topic</th>
+                            <th>MediAnalytics Implementation Feature</th>
+                            <th>Source Code File</th>
+                            <th>Live Verification Route</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- UNIT 1 -->
+                        <tr class="table-light"><td colspan="5" class="fw-bold text-primary ps-3"><i class="bi bi-1-circle me-2"></i>UNIT 1 – NUMPY NUMERICAL COMPUTATION</td></tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-primary">Unit 1</span></td>
+                            <td>Array Creation (1D, 2D, zeros, ones, arange, linspace, eye)</td>
+                            <td>Medication titration curves, baseline vitals vector initialization</td>
+                            <td><code>analytics/numpy_analysis.py</code></td>
+                            <td><a href="{% url 'analytics:numpy' %}" class="btn btn-xs btn-outline-primary py-0 px-2">NumPy Engine</a></td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-primary">Unit 1</span></td>
+                            <td>Shape Manipulation, Reshaping, Slicing & Flattening</td>
+                            <td>Shift-based clinical ward bed allocation (3x4 matrix reshaping)</td>
+                            <td><code>analytics/numpy_analysis.py</code></td>
+                            <td><a href="{% url 'analytics:numpy' %}" class="btn btn-xs btn-outline-primary py-0 px-2">NumPy Engine</a></td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-primary">Unit 1</span></td>
+                            <td>Mathematical Operations & Universal Functions</td>
+                            <td>Vectorized Mean Arterial Pressure (MAP) and Pulse Pressure calculation</td>
+                            <td><code>analytics/numpy_analysis.py</code></td>
+                            <td><a href="{% url 'analytics:numpy' %}" class="btn btn-xs btn-outline-primary py-0 px-2">NumPy Engine</a></td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-primary">Unit 1</span></td>
+                            <td>Random Distributions (Normal, Uniform, Poisson, Exponential)</td>
+                            <td>Synthetic biomarker generation & emergency arrival simulation</td>
+                            <td><code>patients/management/commands/generate_sample_data.py</code></td>
+                            <td><a href="{% url 'analytics:numpy' %}" class="btn btn-xs btn-outline-primary py-0 px-2">NumPy Engine</a></td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-primary">Unit 1</span></td>
+                            <td>Linear Algebra (Dot Product, Determinant, Inverses, Eigenvalues)</td>
+                            <td>Biomarker transition matrix & clinical cardiovascular risk projection</td>
+                            <td><code>analytics/numpy_analysis.py</code></td>
+                            <td><a href="{% url 'analytics:numpy' %}" class="btn btn-xs btn-outline-primary py-0 px-2">NumPy Engine</a></td>
+                        </tr>
+
+                        <!-- UNIT 2 -->
+                        <tr class="table-light"><td colspan="5" class="fw-bold text-info ps-3"><i class="bi bi-2-circle me-2"></i>UNIT 2 – PYTHON APPLICATION DEVELOPMENT</td></tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-info">Unit 2</span></td>
+                            <td>Object-Oriented Programming (Classes, Methods, Encapsulation)</td>
+                            <td>Data cleaner, analyzer, visualizer, and PDF generator OOP classes</td>
+                            <td><code>analytics/data_cleaning.py</code>, <code>reports/pdf_generator.py</code></td>
+                            <td><a href="{% url 'analytics:cleaning' %}" class="btn btn-xs btn-outline-info py-0 px-2">Cleaning View</a></td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-info">Unit 2</span></td>
+                            <td>Regular Expressions (RegEx)</td>
+                            <td>Validation of emails, phone numbers, Patient IDs (<code>^PAT-\d{4}$</code>)</td>
+                            <td><code>patients/forms.py</code>, <code>analytics/views.py</code></td>
+                            <td><a href="{% url 'analytics:json_regex' %}" class="btn btn-xs btn-outline-info py-0 px-2">RegEx Engine</a></td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-info">Unit 2</span></td>
+                            <td>JSON Processing (Serialization & Validation)</td>
+                            <td>Patient database export to JSON, JSON parser & validator</td>
+                            <td><code>analytics/views.py</code></td>
+                            <td><a href="{% url 'analytics:json_regex' %}" class="btn btn-xs btn-outline-info py-0 px-2">JSON Engine</a></td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-info">Unit 2</span></td>
+                            <td>Unit Testing & Automated Quality Assurance</td>
+                            <td>Django TestCase suites for models, cleaning, and views</td>
+                            <td><code>analytics/tests.py</code>, <code>patients/tests.py</code></td>
+                            <td><code>py manage.py test</code></td>
+                        </tr>
+
+                        <!-- UNIT 3 -->
+                        <tr class="table-light"><td colspan="5" class="fw-bold text-success ps-3"><i class="bi bi-3-circle me-2"></i>UNIT 3 – DJANGO WEB ARCHITECTURE</td></tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-success">Unit 3</span></td>
+                            <td>Model-View-Template (MVT) & URL Routing</td>
+                            <td>Modular app decomposition across accounts, patients, analytics, reports</td>
+                            <td><code>config/urls.py</code>, <code>templates/base.html</code></td>
+                            <td><a href="{% url 'dashboard:index' %}" class="btn btn-xs btn-outline-success py-0 px-2">Dashboard</a></td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-success">Unit 3</span></td>
+                            <td>Django ORM & Relational SQLite Database</td>
+                            <td>Patient profiles, OneToOne UserProfiles, ForeignKey Medical Records</td>
+                            <td><code>patients/models.py</code>, <code>medical_records/models.py</code></td>
+                            <td><a href="{% url 'patients:list' %}" class="btn btn-xs btn-outline-success py-0 px-2">Patients List</a></td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-success">Unit 3</span></td>
+                            <td>Authentication & Role-Based Access Control</td>
+                            <td>Administrator vs. Data Analyst roles, login_required decorators</td>
+                            <td><code>accounts/models.py</code>, <code>accounts/views.py</code></td>
+                            <td><a href="{% url 'accounts:profile' %}" class="btn btn-xs btn-outline-success py-0 px-2">User Profile</a></td>
+                        </tr>
+
+                        <!-- UNIT 4 -->
+                        <tr class="table-light"><td colspan="5" class="fw-bold text-warning ps-3"><i class="bi bi-4-circle me-2"></i>UNIT 4 – PANDAS DATA ANALYSIS & PREPROCESSING</td></tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-warning">Unit 4</span></td>
+                            <td>Series & DataFrames (Indexing, Slicing, .loc, .iloc)</td>
+                            <td>Structured clinical dataset exploration, dtypes inspection</td>
+                            <td><code>analytics/pandas_analysis.py</code></td>
+                            <td><a href="{% url 'analytics:pandas' %}" class="btn btn-xs btn-outline-warning py-0 px-2">Pandas Engine</a></td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-warning">Unit 4</span></td>
+                            <td>Data Cleaning, Imputation, and Missing Values (.isna, .fillna)</td>
+                            <td>Mean/Median/Mode imputation, dropping missing cells</td>
+                            <td><code>analytics/data_cleaning.py</code></td>
+                            <td><a href="{% url 'analytics:cleaning' %}" class="btn btn-xs btn-outline-warning py-0 px-2">Cleaning View</a></td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-warning">Unit 4</span></td>
+                            <td>Outlier Detection via Interquartile Range (IQR)</td>
+                            <td>1.5*IQR upper/lower bounding and outlier winsorization</td>
+                            <td><code>analytics/data_cleaning.py</code></td>
+                            <td><a href="{% url 'analytics:cleaning' %}" class="btn btn-xs btn-outline-warning py-0 px-2">Cleaning View</a></td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-warning">Unit 4</span></td>
+                            <td>GroupBy Multi-Metric Aggregation & Pivot Tables</td>
+                            <td>Cardiovascular metrics grouped by clinical outcome and demographics</td>
+                            <td><code>analytics/pandas_analysis.py</code></td>
+                            <td><a href="{% url 'analytics:pandas' %}" class="btn btn-xs btn-outline-warning py-0 px-2">Pandas Engine</a></td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-warning">Unit 4</span></td>
+                            <td>Time Series & Rolling Window Operations</td>
+                            <td>7-day moving averages and expanding cumulative means</td>
+                            <td><code>analytics/pandas_analysis.py</code></td>
+                            <td><a href="{% url 'analytics:pandas' %}" class="btn btn-xs btn-outline-warning py-0 px-2">Pandas Engine</a></td>
+                        </tr>
+
+                        <!-- UNIT 5 -->
+                        <tr class="table-light"><td colspan="5" class="fw-bold text-danger ps-3"><i class="bi bi-5-circle me-2"></i>UNIT 5 – DATA VISUALIZATION & STORYTELLING</td></tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-danger">Unit 5</span></td>
+                            <td>Univariate Numerical (Histogram with KDE, Box Plot, Violin Plot)</td>
+                            <td>Distribution analysis of blood biomarkers and patient ages</td>
+                            <td><code>analytics/visualization.py</code></td>
+                            <td><a href="{% url 'analytics:visualization' %}" class="btn btn-xs btn-outline-danger py-0 px-2">Visualizer</a></td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-danger">Unit 5</span></td>
+                            <td>Univariate Categorical (Count Plot, Proportion Pie Chart)</td>
+                            <td>Frequency breakdown of clinical outcomes and gender distributions</td>
+                            <td><code>analytics/visualization.py</code></td>
+                            <td><a href="{% url 'analytics:visualization' %}" class="btn btn-xs btn-outline-danger py-0 px-2">Visualizer</a></td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-danger">Unit 5</span></td>
+                            <td>Bivariate & Multivariate (Scatter Regression, Heatmaps)</td>
+                            <td>Troponin vs. CK-MB regression, pairwise correlation heatmap</td>
+                            <td><code>analytics/visualization.py</code></td>
+                            <td><a href="{% url 'analytics:visualization' %}" class="btn btn-xs btn-outline-danger py-0 px-2">Visualizer</a></td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3"><span class="badge bg-danger">Unit 5</span></td>
+                            <td>Data Storytelling & Automated Report Generation</td>
+                            <td>ReportLab PDF generator with embedded figures and metrics</td>
+                            <td><code>reports/pdf_generator.py</code></td>
+                            <td><a href="{% url 'reports:list' %}" class="btn btn-xs btn-outline-danger py-0 px-2">Reports List</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Viva Defense Sequence Checklist -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white border-bottom py-3">
+            <h5 class="card-title mb-0 fw-bold text-navy">
+                <i class="bi bi-question-circle text-success me-2"></i>Recommended Viva Demonstration Sequence
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 h-100">
+                        <div class="fw-bold text-primary mb-1">Step 1: Dashboard & Authentication</div>
+                        <small class="text-muted">Log in as <code>admin</code> (or <code>analyst</code>). Show real SQL counts from patients, medical records, and uploaded datasets. Explain role permissions.</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 h-100">
+                        <div class="fw-bold text-primary mb-1">Step 2: CSV Upload & Data Cleaning</div>
+                        <small class="text-muted">Navigate to <b>Data Cleaning</b>. Highlight the synthetic dataset audit: missing values, duplicates, and IQR outliers. Execute imputation and duplicate removal.</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 h-100">
+                        <div class="fw-bold text-primary mb-1">Step 3: NumPy & Pandas Analysis</div>
+                        <small class="text-muted">Open <b>NumPy Analysis</b> to show array math, eigenvalues, and distributions. Open <b>Pandas Analysis</b> to demonstrate GroupBy, Pivot tables, and Moving Averages.</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 h-100">
+                        <div class="fw-bold text-primary mb-1">Step 4: Statistical Evaluation</div>
+                        <small class="text-muted">Show descriptive statistics (skewness, kurtosis, IQR) and Pearson correlation matrix. Emphasize that correlation does NOT imply medical causation.</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 h-100">
+                        <div class="fw-bold text-primary mb-1">Step 5: Visualizations & PDF Reports</div>
+                        <small class="text-muted">Generate Matplotlib/Seaborn KDE, Violin, and Heatmap plots dynamically. Navigate to <b>Reports</b> and download an official ReportLab PDF summary.</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 h-100">
+                        <div class="fw-bold text-primary mb-1">Step 6: RegEx & JSON Validation</div>
+                        <small class="text-muted">Open <b>JSON & RegEx</b>. Test pattern matching for Patient IDs (<code>PAT-\d{4}</code>) and emails. Demonstrate JSON export from the SQLite database.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

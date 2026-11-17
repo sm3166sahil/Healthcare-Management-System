@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Patient: {{ patient.name }} | MediAnalytics{% endblock %}
+
+{% block page_title %}Patient Details{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}" class="text-decoration-none text-muted">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'patients:list' %}" class="text-decoration-none text-muted">Patients</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ patient.name }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="patient-detail-container">
+    <!-- Patient Info Card -->
+    <div class="card shadow-sm border-0 rounded-3 mb-4">
+        <div class="card-header bg-white py-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                    <i class="bi bi-person-badge fs-4"></i>
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2">
+                        <h4 class="fw-bold mb-0 text-dark">{{ patient.name }}</h4>
+                        <span class="badge bg-primary rounded-pill px-2.5 py-1 font-monospace" style="font-size: 0.75rem;">
+                            ID: {{ patient.patient_id|default:patient.id }}
+                        </span>
+                    </div>
+                    <span class="text-muted small">Registered on {{ patient.registration_date|date:"F d, Y"|default:patient.created_at|date:"F d, Y" }}</span>
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="d-flex gap-2">
+                <a href="{% url 'patients:update' patient.pk %}" class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1">
+                    <i class="bi bi-pencil"></i>
+                    <span>Edit Profile</span>
+                </a>
+                <a href="{% url 'patients:delete' patient.pk %}" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1">
+                    <i class="bi bi-trash"></i>
+                    <span>Delete</span>
+                </a>
+                <a href="{% url 'patients:list' %}" class="btn btn-light btn-sm border d-flex align-items-center gap-1">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Back to List</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="row g-4">
+                <!-- Column 1: Demographics -->
+                <div class="col-md-6">
+                    <h6 class="text-uppercase text-secondary fw-bold small mb-3 border-bottom pb-2">
+                        <i class="bi bi-card-text me-1 text-primary"></i> Demographics &amp; Vitals
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <span class="text-muted small d-block">Age</span>
+                            <span class="fw-semibold text-dark fs-6">{{ patient.age }} years old</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted small d-block">Gender</span>
+                            <span class="badge {% if patient.gender == 'M' or patient.gender == 'Male' %}bg-primary-subtle text-primary{% elif patient.gender == 'F' or patient.gender == 'Female' %}bg-danger-subtle text-danger{% else %}bg-secondary-subtle text-secondary{% endif %} rounded-pill px-2.5 py-1">
+                                {{ patient.gender }}
+                            </span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted small d-block">Blood Group</span>
+                            <span class="fw-semibold text-dark">{{ patient.blood_group|default:"Not Tested" }}</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted small d-block">Date of Birth</span>
+                            <span class="fw-semibold text-dark">{{ patient.dob|date:"M d, Y"|default:"Not specified" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2: Contact Information -->
+                <div class="col-md-6">
+                    <h6 class="text-uppercase text-secondary fw-bold small mb-3 border-bottom pb-2">
+                        <i class="bi bi-telephone me-1 text-teal"></i> Contact &amp; Emergency
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <span class="text-muted small d-block">Phone Number</span>
+                            <span class="fw-semibold text-dark">{{ patient.phone|default:"—" }}</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted small d-block">Email Address</span>
+                            <span class="fw-semibold text-dark">{{ patient.email|default:"—" }}</span>
+                        </div>
+                        <div class="col-12">
+                            <span class="text-muted small d-block">Residential Address</span>
+                            <span class="fw-medium text-dark">{{ patient.address|default:"No address on file" }}</span>
+                        </div>
+                        <div class="col-12">
+                            <span class="text-muted small d-block">Emergency Contact</span>
+                            <span class="fw-medium text-dark">{{ patient.emergency_contact|default:"None provided" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Full row for medical notes if present -->
+                {% if patient.notes or patient.medical_history %}
+                <div class="col-12 mt-2">
+                    <h6 class="text-uppercase text-secondary fw-bold small mb-2 border-bottom pb-2">
+                        <i class="bi bi-journal-medical me-1 text-info"></i> Clinical History &amp; Background
+                    </h6>
+                    <div class="p-3 bg-light rounded-3 text-secondary small">
+                        {{ patient.notes|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Medical History Section -->
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-white py-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+            <h6 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-file-earmark-medical text-teal"></i>
+                Clinical History &amp; Diagnostics Records
+            </h6>
+            <a href="{% url 'medical_records:create' %}?patient={{ patient.pk }}" class="btn btn-sm btn-teal text-white d-flex align-items-center gap-1 shadow-sm" style="background-color: var(--teal-secondary);">
+                <i class="bi bi-plus-circle"></i>
+                <span>Add Medical Record</span>
+            </a>
+        </div>
+
+        <div class="card-body p-0">
+            {% if records or patient.medical_records.all %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr class="text-secondary small">
+                            <th class="ps-4">Record ID</th>
+                            <th>Test Date</th>
+                            <th>Heart Rate (bpm)</th>
+                            <th>Blood Pressure</th>
+                            <th>Clinical Outcome</th>
+                            <th class="text-end pe-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                        <tr>
+                            <td class="ps-4 fw-semibold text-primary">
+                                <a href="{% url 'medical_records:detail' record.pk %}" class="text-decoration-none text-primary">
+                                    {{ record.record_id|default:record.id }}
+                                </a>
+                            </td>
+                            <td class="small text-muted">
+                                {{ record.test_date|date:"M d, Y" }}
+                            </td>
+                            <td>
+                                <span class="fw-semibold {% if record.heart_rate > 100 or record.heart_rate < 60 %}text-danger{% else %}text-dark{% endif %}">
+                                    {{ record.heart_rate }}
+                                </span> bpm
+                            </td>
+                            <td>
+                                {{ record.blood_pressure|default:"—" }}
+                            </td>
+                            <td>
+                                <span class="badge {% if record.outcome == 'Normal' or record.outcome == 'Healthy' %}bg-success-subtle text-success{% elif record.outcome == 'Abnormal' or record.outcome == 'Critical' %}bg-danger-subtle text-danger{% else %}bg-warning-subtle text-warning{% endif %} rounded-pill px-2.5 py-1">
+                                    {{ record.outcome|default:"Pending" }}
+                                </span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <a href="{% url 'medical_records:detail' record.pk %}" class="btn btn-sm btn-light border py-1 px-2" title="View Medical Record">
+                                    <i class="bi bi-eye text-primary"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <!-- Empty state for medical records -->
+            <div class="text-center py-5 px-3">
+                <div class="rounded-circle bg-light d-inline-flex p-3 text-muted mb-2">
+                    <i class="bi bi-clipboard2-pulse fs-2 text-teal opacity-75"></i>
+                </div>
+                <h6 class="fw-bold text-dark mb-1">No medical records on file</h6>
+                <p class="small text-muted mb-3">Record diagnostic measurements, vitals, and lab outcomes for this patient.</p>
+                <a href="{% url 'medical_records:create' %}?patient={{ patient.pk }}" class="btn btn-sm btn-outline-teal" style="color: var(--teal-secondary); border-color: var(--teal-secondary);">
+                    <i class="bi bi-plus-lg me-1"></i> Add First Record
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

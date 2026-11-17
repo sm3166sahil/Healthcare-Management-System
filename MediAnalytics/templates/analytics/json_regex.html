@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}JSON & Regular Expressions - MediAnalytics{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-navy mb-1"><i class="bi bi-braces text-teal me-2"></i>JSON Processing & Regular Expression Engine</h2>
+            <p class="text-muted mb-0">Clinical format validation, regex patterns, structured JSON serialization and error handling (FDS Unit 2)</p>
+        </div>
+        <span class="badge bg-primary fs-6 px-3 py-2"><i class="bi bi-mortarboard me-1"></i> FDS Unit 2</span>
+    </div>
+
+    <!-- 1. Regular Expressions Validation Engine -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white border-bottom py-3">
+            <h5 class="card-title mb-0 fw-bold text-navy">
+                <i class="bi bi-regex text-primary me-2"></i>1. Clinical Regular Expression (RegEx) Pattern Validator
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post" class="row g-3">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="test_regex">
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">Validation Pattern Type:</label>
+                    <select name="regex_type" class="form-select">
+                        <option value="email" {% if regex_type == 'email' %}selected{% endif %}>Email Address (Standard RFC)</option>
+                        <option value="phone" {% if regex_type == 'phone' %}selected{% endif %}>Phone Number (+10 to 15 digits)</option>
+                        <option value="patient_id" {% if regex_type == 'patient_id' %}selected{% endif %}>Patient ID Format (^PAT-\d{4}$)</option>
+                        <option value="record_id" {% if regex_type == 'record_id' %}selected{% endif %}>Medical Record ID (^MR-\d{5}$)</option>
+                        <option value="blood_pressure" {% if regex_type == 'blood_pressure' %}selected{% endif %}>Blood Pressure (Systolic/Diastolic)</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Input String to Validate:</label>
+                    <input type="text" name="regex_input" class="form-control" value="{{ regex_input }}" placeholder="e.g. PAT-0042, doctor@hospital.org, +1234567890">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-check2-circle me-1"></i> Test RegEx
+                    </button>
+                </div>
+            </form>
+
+            {% if regex_result %}
+                <div class="mt-4 p-3 rounded-3 {% if regex_result.is_valid %}bg-success-subtle border border-success{% else %}bg-danger-subtle border border-danger{% endif %}">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold fs-6 {% if regex_result.is_valid %}text-success{% else %}text-danger{% endif %}">
+                            <i class="bi {% if regex_result.is_valid %}bi-check-circle-fill{% else %}bi-x-circle-fill{% endif %} me-2"></i>
+                            {% if regex_result.is_valid %}MATCH SUCCESSFUL – Valid Clinical Format{% else %}SYNTAX ERROR – Input Failed Pattern Validation{% endif %}
+                        </span>
+                        <span class="badge {% if regex_result.is_valid %}bg-success{% else %}bg-danger{% endif %}">
+                            {% if regex_result.is_valid %}Valid{% else %}Invalid{% endif %}
+                        </span>
+                    </div>
+                    <div class="small">
+                        <div><b>Tested Pattern:</b> <code>{{ regex_result.pattern }}</code></div>
+                        <div><b>Input Tested:</b> <code>{{ regex_result.input }}</code></div>
+                        {% if regex_result.match_group %}
+                            <div><b>Matched Token:</b> <code>{{ regex_result.match_group }}</code></div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 2. JSON Parser & Validator -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title mb-0 fw-bold text-navy">
+                        <i class="bi bi-braces text-teal me-2"></i>2. JSON Structure Validator & Parser
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="parse_json">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Paste Raw JSON Document:</label>
+                            <textarea name="json_input" class="form-control font-monospace small" rows="8" placeholder='{"patient_id": "PAT-0001", "vitals": {"hr": 78, "bp": "120/80"}}'>{{ json_input }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-teal text-white w-100" style="background-color: #2c7a7b;">
+                            <i class="bi bi-code-slash me-1"></i> Parse & Format JSON
+                        </button>
+                    </form>
+
+                    {% if json_result %}
+                        <div class="mt-3">
+                            {% if json_result.is_valid %}
+                                <div class="alert alert-success py-2 mb-2">
+                                    <i class="bi bi-check-circle me-1"></i> Valid JSON Document (Type: {{ json_result.type }}, Elements: {{ json_result.element_count }})
+                                </div>
+                                <pre class="bg-light p-3 rounded small" style="max-height: 250px; overflow-y: auto;"><code>{{ json_result.formatted }}</code></pre>
+                            {% else %}
+                                <div class="alert alert-danger py-2 mb-0">
+                                    <i class="bi bi-exclamation-triangle me-1"></i> JSON Parsing Error: {{ json_result.error }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Real Patient Database JSON Serializer -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 fw-bold text-navy">
+                        <i class="bi bi-database text-warning me-2"></i>3. Patient Records JSON Export
+                    </h5>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('patientJsonPreview').innerText); alert('Copied to clipboard!');">
+                        <i class="bi bi-clipboard me-1"></i> Copy
+                    </button>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-2">Live serialized JSON feed of patient demographics from SQLite database via Django ORM:</p>
+                    <pre id="patientJsonPreview" class="bg-light p-3 rounded small" style="max-height: 380px; overflow-y: auto;"><code>{{ sample_json }}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

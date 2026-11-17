@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Medical Record: {{ record.record_id|default:record.id }} | MediAnalytics{% endblock %}
+
+{% block page_title %}Medical Record Details{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}" class="text-decoration-none text-muted">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'medical_records:list' %}" class="text-decoration-none text-muted">Medical Records</a></li>
+<li class="breadcrumb-item active" aria-current="page">Record {{ record.record_id|default:record.id }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="record-detail-container">
+    <!-- Header Card -->
+    <div class="card shadow-sm border-0 rounded-3 mb-4">
+        <div class="card-header bg-white py-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-teal bg-opacity-10 text-teal d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background-color: #e6fffa; color: #2c7a7b;">
+                    <i class="bi bi-file-earmark-medical-fill fs-4"></i>
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2">
+                        <h4 class="fw-bold mb-0 text-dark">Clinical Record #{{ record.record_id|default:record.id }}</h4>
+                        <span class="badge {% if record.outcome == 'Normal' or record.outcome == 'Healthy' %}bg-success-subtle text-success{% elif record.outcome == 'Abnormal' or record.outcome == 'Critical' %}bg-danger-subtle text-danger{% else %}bg-warning-subtle text-warning{% endif %} rounded-pill px-3 py-1 fw-semibold">
+                            Outcome: {{ record.outcome|default:"Pending" }}
+                        </span>
+                    </div>
+                    <span class="text-muted small">Conducted on {{ record.test_date|date:"F d, Y" }}</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex gap-2">
+                <a href="{% url 'medical_records:update' record.pk %}" class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1">
+                    <i class="bi bi-pencil"></i>
+                    <span>Edit Record</span>
+                </a>
+                <a href="{% url 'medical_records:delete' record.pk %}" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1">
+                    <i class="bi bi-trash"></i>
+                    <span>Delete</span>
+                </a>
+                <a href="{% url 'medical_records:list' %}" class="btn btn-light btn-sm border d-flex align-items-center gap-1">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Back to List</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            <!-- Patient Banner Card -->
+            <div class="card bg-light border-0 rounded-3 p-3 mb-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-0">{{ record.patient.name }}</h6>
+                            <span class="text-muted small">
+                                ID: {{ record.patient.patient_id|default:record.patient.id }} &bull; 
+                                {{ record.patient.age }} yrs &bull; 
+                                {{ record.patient.gender }} &bull; 
+                                Blood Group: {{ record.patient.blood_group|default:"Not specified" }}
+                            </span>
+                        </div>
+                    </div>
+                    <div>
+                        <a href="{% url 'patients:detail' record.patient.pk %}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-person-badge me-1"></i> View Full Patient Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vitals and Diagnostic Measurements Grid -->
+            <h6 class="text-uppercase text-secondary fw-bold small mb-3 border-bottom pb-2">
+                <i class="bi bi-heart-pulse text-danger me-1"></i> Diagnostic Measurements &amp; Clinical Vitals
+            </h6>
+
+            <div class="row g-3 mb-4">
+                <!-- Heart Rate -->
+                <div class="col-6 col-md-3">
+                    <div class="p-3 rounded-3 bg-white border">
+                        <span class="text-muted small d-block mb-1">Heart Rate</span>
+                        <div class="d-flex align-items-baseline gap-1">
+                            <h4 class="fw-bold mb-0 {% if record.heart_rate > 100 or record.heart_rate < 60 %}text-danger{% else %}text-dark{% endif %}">
+                                {{ record.heart_rate }}
+                            </h4>
+                            <span class="text-muted small">bpm</span>
+                        </div>
+                        <span class="small {% if record.heart_rate > 100 %}text-danger{% elif record.heart_rate < 60 %}text-warning{% else %}text-success{% endif %}">
+                            {% if record.heart_rate > 100 %}Tachycardia{% elif record.heart_rate < 60 %}Bradycardia{% else %}Normal resting{% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Blood Pressure -->
+                <div class="col-6 col-md-3">
+                    <div class="p-3 rounded-3 bg-white border">
+                        <span class="text-muted small d-block mb-1">Blood Pressure</span>
+                        <div class="d-flex align-items-baseline gap-1">
+                            <h4 class="fw-bold mb-0 text-dark">{{ record.blood_pressure|default:"—" }}</h4>
+                            <span class="text-muted small">mmHg</span>
+                        </div>
+                        <span class="small text-muted">Systolic / Diastolic</span>
+                    </div>
+                </div>
+
+                <!-- Glucose Level -->
+                <div class="col-6 col-md-3">
+                    <div class="p-3 rounded-3 bg-white border">
+                        <span class="text-muted small d-block mb-1">Blood Glucose</span>
+                        <div class="d-flex align-items-baseline gap-1">
+                            <h4 class="fw-bold mb-0 text-dark">{{ record.blood_glucose|default:"—" }}</h4>
+                            <span class="text-muted small">mg/dL</span>
+                        </div>
+                        <span class="small text-muted">Fasting / Random</span>
+                    </div>
+                </div>
+
+                <!-- Cholesterol / Temperature -->
+                <div class="col-6 col-md-3">
+                    <div class="p-3 rounded-3 bg-white border">
+                        <span class="text-muted small d-block mb-1">Cholesterol</span>
+                        <div class="d-flex align-items-baseline gap-1">
+                            <h4 class="fw-bold mb-0 text-dark">{{ record.cholesterol|default:"—" }}</h4>
+                            <span class="text-muted small">mg/dL</span>
+                        </div>
+                        <span class="small text-muted">Lipid Profile</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes & Observations -->
+            <div class="row g-3">
+                <div class="col-12">
+                    <h6 class="text-uppercase text-secondary fw-bold small mb-2 border-bottom pb-2">
+                        <i class="bi bi-file-earmark-text text-teal me-1"></i> Clinical Observations &amp; Doctor Notes
+                    </h6>
+                    <div class="p-3 bg-light rounded-3 text-secondary">
+                        {% if record.notes %}
+                            <p class="mb-0">{{ record.notes|linebreaks }}</p>
+                        {% else %}
+                            <p class="mb-0 text-muted fst-italic">No additional clinical notes recorded for this examination.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

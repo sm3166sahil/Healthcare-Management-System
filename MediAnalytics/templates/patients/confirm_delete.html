@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Patient: {{ patient.name }} | MediAnalytics{% endblock %}
+
+{% block page_title %}Confirm Patient Deletion{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}" class="text-decoration-none text-muted">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'patients:list' %}" class="text-decoration-none text-muted">Patients</a></li>
+<li class="breadcrumb-item active" aria-current="page">Confirm Delete</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0 border-start border-4 border-danger rounded-3">
+            <div class="card-body p-4 text-center">
+                <div class="rounded-circle bg-danger bg-opacity-10 text-danger d-inline-flex p-3 mb-3">
+                    <i class="bi bi-exclamation-triangle-fill fs-1"></i>
+                </div>
+                <h4 class="fw-bold text-dark mb-2">Delete Patient Profile?</h4>
+                <p class="text-secondary mb-4">
+                    Are you sure you want to permanently delete patient <strong>{{ patient.name }}</strong> (ID: {{ patient.patient_id|default:patient.id }})?
+                </p>
+
+                <div class="card bg-light border-0 rounded-3 text-start p-3 mb-4">
+                    <h6 class="fw-bold text-dark mb-2 small text-uppercase">Patient Summary</h6>
+                    <div class="row g-2 small">
+                        <div class="col-6 text-muted">Full Name:</div>
+                        <div class="col-6 fw-semibold text-dark">{{ patient.name }}</div>
+
+                        <div class="col-6 text-muted">Age / Gender:</div>
+                        <div class="col-6 fw-semibold text-dark">{{ patient.age }} yrs / {{ patient.gender }}</div>
+
+                        <div class="col-6 text-muted">Phone Number:</div>
+                        <div class="col-6 fw-semibold text-dark">{{ patient.phone|default:"—" }}</div>
+
+                        <div class="col-6 text-muted">Registered Since:</div>
+                        <div class="col-6 fw-semibold text-dark">{{ patient.registration_date|date:"M d, Y"|default:patient.created_at|date:"M d, Y" }}</div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning border-0 d-flex align-items-center text-start small mb-4 py-2 px-3" role="alert">
+                    <i class="bi bi-exclamation-circle-fill text-warning fs-5 me-2"></i>
+                    <div>
+                        <strong>Warning:</strong> Deleting this patient will also permanently delete or disassociate all linked clinical and medical test records. This action cannot be undone.
+                    </div>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'patients:detail' patient.pk %}" class="btn btn-light px-4">
+                            <i class="bi bi-x-circle me-1"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger px-4 d-flex align-items-center gap-2 shadow-sm">
+                            <i class="bi bi-trash-fill"></i>
+                            <span>Confirm Delete</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

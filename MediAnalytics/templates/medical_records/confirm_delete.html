@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Record: #{{ record.record_id|default:record.id }} | MediAnalytics{% endblock %}
+
+{% block page_title %}Confirm Record Deletion{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}" class="text-decoration-none text-muted">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'medical_records:list' %}" class="text-decoration-none text-muted">Medical Records</a></li>
+<li class="breadcrumb-item active" aria-current="page">Confirm Delete</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0 border-start border-4 border-danger rounded-3">
+            <div class="card-body p-4 text-center">
+                <div class="rounded-circle bg-danger bg-opacity-10 text-danger d-inline-flex p-3 mb-3">
+                    <i class="bi bi-trash3-fill fs-1"></i>
+                </div>
+                <h4 class="fw-bold text-dark mb-2">Delete Medical Record?</h4>
+                <p class="text-secondary mb-4">
+                    Are you sure you want to permanently delete clinical record <strong>#{{ record.record_id|default:record.id }}</strong>?
+                </p>
+
+                <div class="card bg-light border-0 rounded-3 text-start p-3 mb-4">
+                    <h6 class="fw-bold text-dark mb-2 small text-uppercase">Record Summary</h6>
+                    <div class="row g-2 small">
+                        <div class="col-6 text-muted">Patient:</div>
+                        <div class="col-6 fw-semibold text-dark">{{ record.patient.name }}</div>
+
+                        <div class="col-6 text-muted">Test Date:</div>
+                        <div class="col-6 fw-semibold text-dark">{{ record.test_date|date:"M d, Y" }}</div>
+
+                        <div class="col-6 text-muted">Vitals:</div>
+                        <div class="col-6 fw-semibold text-dark">{{ record.heart_rate }} bpm / {{ record.blood_pressure }} mmHg</div>
+
+                        <div class="col-6 text-muted">Clinical Outcome:</div>
+                        <div class="col-6 fw-semibold text-dark">{{ record.outcome|default:"Pending" }}</div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning border-0 d-flex align-items-center text-start small mb-4 py-2 px-3" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill text-warning fs-5 me-2"></i>
+                    <div>
+                        <strong>Notice:</strong> This action cannot be reverted. This medical record and its diagnostic indicators will be removed permanently from statistical analyses.
+                    </div>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'medical_records:detail' record.pk %}" class="btn btn-light px-4">
+                            <i class="bi bi-x-circle me-1"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger px-4 d-flex align-items-center gap-2 shadow-sm">
+                            <i class="bi bi-trash-fill"></i>
+                            <span>Confirm Delete</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Data Cleaning & Preprocessing - MediAnalytics{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-navy mb-1"><i class="bi bi-funnel text-teal me-2"></i>Data Cleaning & Preprocessing</h2>
+            <p class="text-muted mb-0">Interactive Pandas-powered clinical data cleaning, imputation, and IQR outlier detection (FDS Unit 4 & Module 5)</p>
+        </div>
+    </div>
+
+    <!-- Dataset Selector Card -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-center">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Select Healthcare Dataset to Clean:</label>
+                    <select name="dataset_id" class="form-select" onchange="this.form.submit()">
+                        <option value="">-- Choose an uploaded dataset --</option>
+                        {% for ds in datasets %}
+                            <option value="{{ ds.id }}" {% if selected_dataset.id == ds.id %}selected{% endif %}>
+                                {{ ds.title }} ({{ ds.row_count|default:"?" }} rows, {{ ds.column_count|default:"?" }} cols) {% if ds.is_cleaned %} - [CLEANED]{% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    {% if selected_dataset %}
+                        <div class="badge bg-primary-subtle text-primary p-2 me-2">
+                            <i class="bi bi-file-earmark-spreadsheet me-1"></i> Active File: {{ selected_dataset.file_name }}
+                        </div>
+                        {% if selected_dataset.is_cleaned %}
+                            <form method="post" class="d-inline" onsubmit="return confirm('Restore dataset to original uncleaned CSV?');">
+                                {% csrf_token %}
+                                <input type="hidden" name="dataset_id" value="{{ selected_dataset.id }}">
+                                <input type="hidden" name="action" value="restore_original">
+                                <button type="submit" class="btn btn-outline-warning btn-sm">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i>Restore Original
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if selected_dataset and audit %}
+        <!-- Quality Diagnostic KPI Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card primary">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stat-label">Total Observations</div>
+                            <div class="stat-value">{{ audit.total_rows }}</div>
+                        </div>
+                        <div class="stat-icon bg-primary-subtle text-primary">
+                            <i class="bi bi-table"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card {% if audit.total_missing_cells > 0 %}warning{% else %}success{% endif %}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stat-label">Missing Cells</div>
+                            <div class="stat-value">{{ audit.total_missing_cells }}</div>
+                        </div>
+                        <div class="stat-icon bg-warning-subtle text-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card {% if audit.duplicate_count > 0 %}danger{% else %}success{% endif %}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stat-label">Duplicate Rows</div>
+                            <div class="stat-value">{{ audit.duplicate_count }} ({{ audit.duplicate_pct }}%)</div>
+                        </div>
+                        <div class="stat-icon bg-danger-subtle text-danger">
+                            <i class="bi bi-copy"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card info">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stat-label">Outlier Features</div>
+                            <div class="stat-value">{{ audit.outlier_summary|length }}</div>
+                        </div>
+                        <div class="stat-icon bg-info-subtle text-info">
+                            <i class="bi bi-activity"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <!-- 1. Missing Values Handler -->
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="card-title mb-0 fw-bold text-navy">
+                            <i class="bi bi-clipboard2-pulse text-warning me-2"></i>1. Missing Value Imputation
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if audit.missing_summary %}
+                            <div class="table-responsive mb-3" style="max-height: 200px;">
+                                <table class="table table-sm table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Column</th>
+                                            <th>Missing Cells</th>
+                                            <th>Missing %</th>
+                                            <th>Data Type</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for m in audit.missing_summary %}
+                                            <tr>
+                                                <td class="fw-semibold">{{ m.column }}</td>
+                                                <td><span class="badge bg-warning-subtle text-warning">{{ m.null_count }}</span></td>
+                                                <td>{{ m.null_pct }}%</td>
+                                                <td><code>{{ m.dtype }}</code></td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-success py-2 mb-3">
+                                <i class="bi bi-check-circle me-1"></i> No missing values detected in this dataset!
+                            </div>
+                        {% endif %}
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="dataset_id" value="{{ selected_dataset.id }}">
+                            <input type="hidden" name="action" value="impute_missing">
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-semibold">Target Column (optional):</label>
+                                    <select name="column" class="form-select form-select-sm">
+                                        <option value="">-- All Affected Columns --</option>
+                                        {% for m in audit.missing_summary %}
+                                            <option value="{{ m.column }}">{{ m.column }} ({{ m.null_count }} nulls)</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-semibold">Imputation Strategy:</label>
+                                    <select name="strategy" class="form-select form-select-sm">
+                                        <option value="mean">Mean (Numerical Features)</option>
+                                        <option value="median">Median (Skewed Features)</option>
+                                        <option value="mode">Mode (Categorical Features)</option>
+                                        <option value="drop_rows">Drop Rows with Missing Values</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm w-100" {% if not audit.missing_summary %}disabled{% endif %}>
+                                <i class="bi bi-magic me-1"></i> Execute Imputation
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Duplicate Detection & Removal -->
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="card-title mb-0 fw-bold text-navy">
+                            <i class="bi bi-copy text-danger me-2"></i>2. Duplicate Record Handling
+                        </h5>
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <p class="text-muted small">
+                                Duplicated rows can bias statistical metrics and artificial outcome frequency. Uses Pandas <code>duplicated()</code> and <code>drop_duplicates()</code>.
+                            </p>
+                            <div class="p-3 bg-light rounded-3 mb-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Duplicate Rows Identified:</span>
+                                    <span class="fw-bold {% if audit.duplicate_count > 0 %}text-danger{% else %}text-success{% endif %}">
+                                        {{ audit.duplicate_count }} rows
+                                    </span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Proportion of Dataset:</span>
+                                    <span class="fw-bold">{{ audit.duplicate_pct }}%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="dataset_id" value="{{ selected_dataset.id }}">
+                            <input type="hidden" name="action" value="remove_duplicates">
+                            <button type="submit" class="btn btn-outline-danger btn-sm w-100" {% if audit.duplicate_count == 0 %}disabled{% endif %}>
+                                <i class="bi bi-trash3 me-1"></i> Eliminate Duplicate Rows
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. IQR Outlier Detection & Capping -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="card-title mb-0 fw-bold text-navy">
+                    <i class="bi bi-bounding-box text-info me-2"></i>3. Outlier Detection via Interquartile Range (IQR) Method
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">
+                    Calculates bounds using <code>IQR = Q3 - Q1</code>, <code>Lower Bound = Q1 - 1.5*IQR</code>, <code>Upper Bound = Q3 + 1.5*IQR</code>.
+                    Extreme measurements can be winsorized (capped) or removed. Medically valid high values should generally be capped rather than dropped.
+                </p>
+
+                {% if audit.outlier_summary %}
+                    <div class="table-responsive mb-4">
+                        <table class="table table-sm table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Feature Name</th>
+                                    <th>Q1 (25%)</th>
+                                    <th>Q3 (75%)</th>
+                                    <th>IQR</th>
+                                    <th>Lower Bound</th>
+                                    <th>Upper Bound</th>
+                                    <th>Outliers Count</th>
+                                    <th>Outlier %</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for out in audit.outlier_summary %}
+                                    <tr>
+                                        <td class="fw-semibold text-navy">{{ out.column }}</td>
+                                        <td>{{ out.q1 }}</td>
+                                        <td>{{ out.q3 }}</td>
+                                        <td>{{ out.iqr }}</td>
+                                        <td><span class="badge bg-light text-dark">{{ out.lower_bound }}</span></td>
+                                        <td><span class="badge bg-light text-dark">{{ out.upper_bound }}</span></td>
+                                        <td><span class="badge bg-danger-subtle text-danger">{{ out.outlier_count }}</span></td>
+                                        <td>{{ out.outlier_pct }}%</td>
+                                        <td>
+                                            <form method="post" class="d-inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="dataset_id" value="{{ selected_dataset.id }}">
+                                                <input type="hidden" name="action" value="handle_outliers">
+                                                <input type="hidden" name="column" value="{{ out.column }}">
+                                                <input type="hidden" name="method" value="cap">
+                                                <button type="submit" class="btn btn-outline-primary btn-xs py-1 px-2" title="Winsorize / Cap to 1.5*IQR">
+                                                    Cap Outliers
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-success py-2 mb-3">
+                        <i class="bi bi-check-circle me-1"></i> No extreme mathematical outliers detected across numeric features!
+                    </div>
+                {% endif %}
+
+                <!-- 4. Categorical Normalization & Save Changes -->
+                <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center pt-3 border-top">
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="dataset_id" value="{{ selected_dataset.id }}">
+                        <input type="hidden" name="action" value="normalize_categories">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-type me-1"></i> Normalize String Casing & Trim Whitespace
+                        </button>
+                    </form>
+
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="dataset_id" value="{{ selected_dataset.id }}">
+                        <input type="hidden" name="action" value="save_as_cleaned">
+                        <button type="submit" class="btn btn-success btn-sm">
+                            <i class="bi bi-check-circle-fill me-1"></i> Save Cleaned Dataset as Active Version
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    {% elif selected_dataset %}
+        <div class="card shadow-sm border-0 p-5 text-center">
+            <i class="bi bi-exclamation-circle text-warning display-4 mb-3"></i>
+            <h5>Unable to parse selected dataset file</h5>
+            <p class="text-muted">Ensure the file exists in <code>media/uploaded_datasets/</code> and has valid CSV formatting.</p>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="bi bi-funnel text-muted mb-3" style="font-size: 3rem;"></i>
+            <h5>No Dataset Selected</h5>
+            <p class="text-muted">Please select an uploaded healthcare dataset from the dropdown above to begin data auditing and cleaning.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

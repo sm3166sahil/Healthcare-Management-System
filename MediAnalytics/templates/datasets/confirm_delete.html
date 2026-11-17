@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Dataset | MediAnalytics{% endblock %}
+
+{% block page_title %}Delete Dataset{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}" class="text-decoration-none text-muted">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'datasets:list' %}" class="text-decoration-none text-muted">Datasets</a></li>
+<li class="breadcrumb-item active" aria-current="page">Delete</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0 rounded-3 text-center p-4">
+            <div class="card-body">
+                <div class="rounded-circle bg-danger bg-opacity-10 text-danger d-inline-flex p-3 mb-3">
+                    <i class="bi bi-trash3-fill fs-1"></i>
+                </div>
+                <h4 class="fw-bold text-dark mb-2">Delete Dataset?</h4>
+                <p class="text-secondary mb-4">
+                    Are you sure you want to permanently delete dataset <strong>"{{ dataset.title }}"</strong>?
+                </p>
+
+                <div class="card bg-light border-0 rounded-3 text-start p-3 mb-4">
+                    <h6 class="fw-bold text-dark mb-2 small text-uppercase">Dataset Details</h6>
+                    <div class="row g-2 small">
+                        <div class="col-6 text-muted">Filename:</div>
+                        <div class="col-6 fw-semibold text-dark">{{ dataset.file_name }}</div>
+
+                        <div class="col-6 text-muted">Rows / Columns:</div>
+                        <div class="col-6 fw-semibold text-dark">{{ dataset.row_count|default:"0" }} &times; {{ dataset.column_count|default:"0" }}</div>
+
+                        <div class="col-6 text-muted">Uploaded By:</div>
+                        <div class="col-6 fw-semibold text-dark">{{ dataset.uploaded_by.username|default:"System" }}</div>
+
+                        <div class="col-6 text-muted">Uploaded Date:</div>
+                        <div class="col-6 fw-semibold text-dark">{{ dataset.uploaded_at|date:"M d, Y" }}</div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning border-0 d-flex align-items-center text-start small mb-4 py-2 px-3" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill text-warning fs-5 me-2"></i>
+                    <div>This action cannot be undone. Associated data cleaning caches and analysis runs will also be invalidated.</div>
+                </div>
+
+                <form method="post" class="d-flex justify-content-center gap-2">
+                    {% csrf_token %}
+                    <a href="{% url 'datasets:list' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                    <button type="submit" class="btn btn-danger px-4 d-flex align-items-center gap-1">
+                        <i class="bi bi-trash"></i> Permanently Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

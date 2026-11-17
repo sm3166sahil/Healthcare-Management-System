@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Statistical Analysis - MediAnalytics{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-navy mb-1"><i class="bi bi-graph-up text-teal me-2"></i>Statistical Healthcare Analysis</h2>
+            <p class="text-muted mb-0">Parametric & Non-parametric Descriptive Statistics, Correlation Matrices, and Group Stratification (FDS Units 1 & 4)</p>
+        </div>
+        <span class="badge bg-primary fs-6 px-3 py-2"><i class="bi bi-mortarboard me-1"></i> FDS Units 1 & 4</span>
+    </div>
+
+    <!-- Dataset Selector Card -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-center">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Select Dataset for Statistical Evaluation:</label>
+                    <select name="dataset_id" class="form-select" onchange="this.form.submit()">
+                        <option value="">-- Choose an uploaded dataset --</option>
+                        {% for ds in datasets %}
+                            <option value="{{ ds.id }}" {% if selected_dataset.id == ds.id %}selected{% endif %}>
+                                {{ ds.title }} ({{ ds.row_count|default:"?" }} rows, {{ ds.column_count|default:"?" }} cols)
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if selected_dataset and stats_list %}
+        <!-- Important Academic Disclaimer Alert -->
+        <div class="alert alert-info border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-info-circle-fill fs-4 me-3 text-info"></i>
+            <div>
+                <b>Academic Notice on Correlation vs. Causation:</b> Statistical association does not demonstrate medical etiology or clinical causation. Observed correlations indicate mathematical collinearity within observational records.
+            </div>
+        </div>
+
+        <!-- 1. Full Descriptive Statistics Matrix -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="card-title mb-0 fw-bold text-navy">
+                    <i class="bi bi-table text-primary me-2"></i>1. Univariate Descriptive Statistics & Distribution Shape
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered table-sm align-middle text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-start ps-3">Biomarker / Metric</th>
+                                <th>Count</th>
+                                <th>Mean</th>
+                                <th>Std Dev</th>
+                                <th>Variance</th>
+                                <th>Median</th>
+                                <th>Mode</th>
+                                <th>Min</th>
+                                <th>Max</th>
+                                <th>Range</th>
+                                <th>IQR</th>
+                                <th>Skewness</th>
+                                <th>Kurtosis</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in stats_list %}
+                                <tr>
+                                    <td class="fw-bold text-navy text-start ps-3">{{ s.metric }}</td>
+                                    <td>{{ s.count }}</td>
+                                    <td class="fw-bold text-primary">{{ s.mean }}</td>
+                                    <td>{{ s.std }}</td>
+                                    <td>{{ s.variance }}</td>
+                                    <td class="text-teal fw-semibold">{{ s.median }}</td>
+                                    <td>{{ s.mode }}</td>
+                                    <td>{{ s.min }}</td>
+                                    <td>{{ s.max }}</td>
+                                    <td>{{ s.range }}</td>
+                                    <td>{{ s.iqr }}</td>
+                                    <td class="{% if s.skewness > 1 or s.skewness < -1 %}text-warning fw-bold{% endif %}">{{ s.skewness }}</td>
+                                    <td>{{ s.kurtosis }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <small class="text-muted d-block mt-2">
+                    * Skewness &gt; |1.0| indicates substantial asymmetry; positive values reflect right-skewed tail.
+                </small>
+            </div>
+        </div>
+
+        <!-- 2. Correlation Analysis (Pearson & Spearman) -->
+        {% if pearson_corr and pearson_corr.matrix %}
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title mb-0 fw-bold text-navy">
+                        <i class="bi bi-bezier2 text-teal me-2"></i>2. Pearson Correlation Matrix (r)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered table-sm align-middle text-center">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Feature</th>
+                                    {% for c in pearson_corr.columns %}
+                                        <th>{{ c }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in pearson_corr.matrix %}
+                                    <tr>
+                                        <td class="fw-bold text-navy text-start ps-2">{{ row.name }}</td>
+                                        {% for v in row.values %}
+                                            <td style="background-color: {% if v.is_diagonal %}#f0f4f8{% elif v.val > 0.5 %}rgba(44, 122, 123, 0.2){% elif v.val < -0.3 %}rgba(229, 62, 62, 0.15){% else %}transparent{% endif %};">
+                                                <span class="{% if v.is_diagonal %}text-muted{% elif v.val > 0.5 %}text-teal fw-bold{% elif v.val < -0.3 %}text-danger fw-bold{% endif %}">
+                                                    {{ v.val }}
+                                                </span>
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Top Associations List -->
+                    {% if pearson_corr.top_pairs %}
+                        <h6 class="fw-bold text-navy mb-3">Strongest Pairwise Associations:</h6>
+                        <div class="row g-3">
+                            {% for p in pearson_corr.top_pairs %}
+                                <div class="col-md-3">
+                                    <div class="p-3 bg-light rounded-3 border">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="badge bg-primary-subtle text-primary">{{ p.strength }}</span>
+                                            <span class="fw-bold fs-6 {% if p.correlation > 0 %}text-teal{% else %}text-danger{% endif %}">
+                                                r = {{ p.correlation }}
+                                            </span>
+                                        </div>
+                                        <div class="small fw-semibold text-navy">{{ p.var1 }} &amp; {{ p.var2 }}</div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- 3. Group Comparisons Stratified by Outcome -->
+        {% if group_comp and group_comp.comparisons %}
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title mb-0 fw-bold text-navy">
+                        <i class="bi bi-people text-warning me-2"></i>3. Group Stratification by <code>{{ group_comp.group_column }}</code>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        {% for comp in group_comp.comparisons %}
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 h-100">
+                                    <h6 class="fw-bold text-navy mb-2">{{ comp.metric }} Stratified Breakdown</h6>
+                                    <table class="table table-sm table-hover align-middle text-center mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>{{ group_comp.group_column }}</th>
+                                                <th>Sample N</th>
+                                                <th>Mean</th>
+                                                <th>Std Dev</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for grp in comp.groups %}
+                                                <tr>
+                                                    <td class="fw-semibold text-start ps-3">{{ grp.group }}</td>
+                                                    <td>{{ grp.count }}</td>
+                                                    <td class="fw-bold text-primary">{{ grp.mean }}</td>
+                                                    <td>{{ grp.std }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+    {% else %}
+        <div class="empty-state">
+            <i class="bi bi-graph-up text-muted mb-3" style="font-size: 3rem;"></i>
+            <h5>No Dataset Selected</h5>
+            <p class="text-muted">Please select an uploaded healthcare dataset from the dropdown above to generate statistical analyses and correlation matrices.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

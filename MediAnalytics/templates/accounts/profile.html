@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}User Profile | MediAnalytics{% endblock %}
+
+{% block page_title %}Account Profile{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}" class="text-decoration-none text-muted">Home</a></li>
+<li class="breadcrumb-item active" aria-current="page">Profile</li>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- User Overview Card -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 rounded-3 text-center p-4">
+            <div class="d-flex justify-content-center mb-3">
+                <div class="avatar-circle rounded-circle bg-primary text-white d-flex align-items-center justify-content-center shadow" style="width: 88px; height: 88px; font-size: 2.2rem; background: linear-gradient(135deg, #1a365d, #2c7a7b) !important;">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+            </div>
+            <h5 class="fw-bold mb-1 text-dark">{{ request.user.get_full_name|default:request.user.username }}</h5>
+            <p class="text-muted small mb-2">@{{ request.user.username }}</p>
+            <div class="mb-3">
+                <span class="badge bg-teal-subtle text-teal px-3 py-2 rounded-pill fw-semibold" style="background-color: #e6fffa; color: #2c7a7b; font-size: 0.8rem;">
+                    <i class="bi bi-shield-check me-1"></i>
+                    {% if request.user.role %}
+                        {{ request.user.role|title }}
+                    {% elif request.user.is_superuser %}
+                        System Administrator
+                    {% else %}
+                        Clinician / Analyst
+                    {% endif %}
+                </span>
+            </div>
+            <hr class="my-3 text-muted">
+            <div class="text-start small">
+                <div class="d-flex justify-content-between py-1">
+                    <span class="text-muted"><i class="bi bi-envelope me-2"></i>Email</span>
+                    <span class="fw-medium text-dark">{{ request.user.email|default:"Not specified" }}</span>
+                </div>
+                <div class="d-flex justify-content-between py-1">
+                    <span class="text-muted"><i class="bi bi-calendar-event me-2"></i>Joined</span>
+                    <span class="fw-medium text-dark">{{ request.user.date_joined|date:"M d, Y"|default:"Recently" }}</span>
+                </div>
+                <div class="d-flex justify-content-between py-1">
+                    <span class="text-muted"><i class="bi bi-clock-history me-2"></i>Last Active</span>
+                    <span class="fw-medium text-dark">{{ request.user.last_login|date:"M d, Y H:i"|default:"Just now" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security / Password Card -->
+        <div class="card shadow-sm border-0 rounded-3 mt-4 p-4">
+            <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                <i class="bi bi-key-fill text-warning"></i>
+                <span>Security &amp; Password</span>
+            </h6>
+            <p class="text-muted small mb-3">Ensure your account is protected with a strong credentials policy.</p>
+            <a href="{% url 'accounts:password_change' %}" class="btn btn-outline-secondary w-100 btn-sm py-2 d-flex align-items-center justify-content-center gap-2">
+                <i class="bi bi-shield-lock"></i>
+                <span>Change Password</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Edit Profile Form -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-white border-bottom py-3">
+                <h6 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-person-gear text-primary"></i>
+                    <span>Edit Profile Details</span>
+                </h6>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" action="{% url 'accounts:profile' %}">
+                    {% csrf_token %}
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="first_name" class="form-label small fw-semibold text-secondary">First Name</label>
+                            <input type="text" name="first_name" id="first_name" class="form-control" value="{{ request.user.first_name }}" placeholder="First name">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="last_name" class="form-label small fw-semibold text-secondary">Last Name</label>
+                            <input type="text" name="last_name" id="last_name" class="form-control" value="{{ request.user.last_name }}" placeholder="Last name">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="email" class="form-label small fw-semibold text-secondary">Email Address</label>
+                            <input type="email" name="email" id="email" class="form-control" value="{{ request.user.email }}" placeholder="user@domain.com">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="username" class="form-label small fw-semibold text-secondary">Username</label>
+                            <input type="text" id="username" class="form-control bg-light" value="{{ request.user.username }}" readonly disabled>
+                            <div class="form-text small">Username cannot be modified.</div>
+                        </div>
+                    </div>
+
+                    {% if form.role or request.user.role %}
+                    <div class="mb-3">
+                        <label for="role" class="form-label small fw-semibold text-secondary">Role / Specialty</label>
+                        <select name="role" id="role" class="form-select">
+                            <option value="doctor" {% if request.user.role == 'doctor' %}selected{% endif %}>Doctor / Physician</option>
+                            <option value="analyst" {% if request.user.role == 'analyst' or not request.user.role %}selected{% endif %}>Data Analyst / Scientist</option>
+                            <option value="nurse" {% if request.user.role == 'nurse' %}selected{% endif %}>Nurse / Clinical Staff</option>
+                            <option value="researcher" {% if request.user.role == 'researcher' %}selected{% endif %}>Medical Researcher</option>
+                            <option value="admin" {% if request.user.role == 'admin' %}selected{% endif %}>Healthcare Administrator</option>
+                        </select>
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{% url 'dashboard:index' %}" class="btn btn-light px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 d-flex align-items-center gap-2" style="background-color: var(--primary-navy); border-color: var(--primary-navy);">
+                            <i class="bi bi-check-circle"></i>
+                            <span>Save Changes</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

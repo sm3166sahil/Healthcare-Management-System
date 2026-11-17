@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NumPy Data Analysis - MediAnalytics{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-navy mb-1"><i class="bi bi-calculator text-teal me-2"></i>NumPy Numerical Computing Engine</h2>
+            <p class="text-muted mb-0">Demonstrating all Fundamentals of Data Science (21CSS202T) Unit 1 syllabus concepts using clinical vector math</p>
+        </div>
+        <span class="badge bg-primary fs-6 px-3 py-2"><i class="bi bi-mortarboard me-1"></i> FDS Unit 1</span>
+    </div>
+
+    <!-- Live Dataset Feature Calculator -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white border-bottom py-3">
+            <h5 class="card-title mb-0 fw-bold text-navy"><i class="bi bi-activity text-teal me-2"></i>Live NumPy Evaluation on Dataset Column</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end mb-3">
+                <div class="col-md-5">
+                    <label class="form-label small fw-semibold">Select Dataset:</label>
+                    <select name="dataset_id" class="form-select" onchange="this.form.submit()">
+                        <option value="">-- Choose a dataset to analyze --</option>
+                        {% for ds in datasets %}
+                            <option value="{{ ds.id }}" {% if selected_dataset.id == ds.id %}selected{% endif %}>
+                                {{ ds.title }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label small fw-semibold">Target Column (e.g. Heart_Rate, Cholesterol, Troponin):</label>
+                    <input type="text" name="column" class="form-control" value="{{ column_name|default:'Heart_Rate' }}" placeholder="Column name">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-play-circle me-1"></i> Compute</button>
+                </div>
+            </form>
+
+            {% if custom_stats %}
+                <div class="p-3 bg-light rounded-3">
+                    <h6 class="fw-bold text-navy mb-3">NumPy Descriptive Statistics: <code>{{ column_name }}</code></h6>
+                    <div class="row g-3 text-center">
+                        <div class="col-6 col-md-2">
+                            <div class="bg-white p-2 rounded shadow-sm">
+                                <small class="text-muted d-block">Count</small>
+                                <span class="fw-bold fs-6">{{ custom_stats.count }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <div class="bg-white p-2 rounded shadow-sm">
+                                <small class="text-muted d-block">Mean</small>
+                                <span class="fw-bold fs-6 text-primary">{{ custom_stats.mean|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <div class="bg-white p-2 rounded shadow-sm">
+                                <small class="text-muted d-block">Std Dev</small>
+                                <span class="fw-bold fs-6 text-warning">{{ custom_stats.std_dev|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <div class="bg-white p-2 rounded shadow-sm">
+                                <small class="text-muted d-block">Median</small>
+                                <span class="fw-bold fs-6 text-teal">{{ custom_stats.median|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <div class="bg-white p-2 rounded shadow-sm">
+                                <small class="text-muted d-block">IQR</small>
+                                <span class="fw-bold fs-6">{{ custom_stats.iqr|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <div class="bg-white p-2 rounded shadow-sm">
+                                <small class="text-muted d-block">99th %tile</small>
+                                <span class="fw-bold fs-6 text-danger">{{ custom_stats.99th_percentile|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Unit 1 Concept Demonstrations Grid -->
+    <div class="row g-4 mb-4">
+        <!-- A. Array Creation & Properties -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title mb-0 fw-bold text-navy">
+                        <i class="bi bi-grid-3x3 text-primary me-2"></i>A. Array Creation & Properties
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">Demonstrating <code>np.array()</code>, <code>np.zeros()</code>, <code>np.ones()</code>, <code>np.arange()</code>, and <code>np.linspace()</code>.</p>
+                    
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-navy">1D Observation Vector (Heart Rates):</label>
+                        <pre class="bg-light p-2 rounded small text-dark mb-1"><code>{{ array_creation.np_array_1d.array }}</code></pre>
+                        <small class="text-muted">Shape: <b>{{ array_creation.np_array_1d.shape }}</b> | Dimensions (ndim): <b>{{ array_creation.np_array_1d.ndim }}</b> | Size: <b>{{ array_creation.np_array_1d.size }}</b> | dtype: <b>{{ array_creation.np_array_1d.dtype }}</b></small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-navy">Medication Titration Range (<code>np.arange(10, 110, 10)</code>):</label>
+                        <pre class="bg-light p-2 rounded small text-dark mb-0"><code>{{ array_creation.arange_dosage }}</code></pre>
+                    </div>
+
+                    <div>
+                        <label class="form-label small fw-semibold text-navy">Continuous Dosage Points (<code>np.linspace(0.1, 1.0, 5)</code>):</label>
+                        <pre class="bg-light p-2 rounded small text-dark mb-0"><code>{{ array_creation.linspace_titration }}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- B. Array Manipulation & Reshaping -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title mb-0 fw-bold text-navy">
+                        <i class="bi bi-arrows-angle-expand text-teal me-2"></i>B. Reshaping, Slicing & Splitting
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">Reshaping 12 clinical observations across 3 nurse shifts x 4 beds using <code>reshape()</code>, <code>split()</code>, and slicing.</p>
+                    
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-navy">Reshaped 3x4 Matrix (Shifts x Beds):</label>
+                        <pre class="bg-light p-2 rounded small text-dark mb-0"><code>{{ manipulation.reshaped_3x4 }}</code></pre>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-navy">Sub-matrix Slice [0:2, 0:2] (Beds 1-2, Shifts 1-2):</label>
+                        <pre class="bg-light p-2 rounded small text-dark mb-0"><code>{{ manipulation.sliced_2x2 }}</code></pre>
+                    </div>
+
+                    <div>
+                        <label class="form-label small fw-semibold text-navy">Flattened 1D Array via <code>flatten()</code>:</label>
+                        <pre class="bg-light p-2 rounded small text-dark mb-0"><code>{{ manipulation.flattened }}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- C. Mathematical Operations & Broadcasting -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title mb-0 fw-bold text-navy">
+                        <i class="bi bi-calculator-fill text-warning me-2"></i>C. Universal Functions & Broadcasting
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">Vectorized mathematical formulations in cardiovascular hemodynamics without slow Python for-loops.</p>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Systolic (mmHg)</th>
+                                    <th>Diastolic (mmHg)</th>
+                                    <th>Pulse Pressure (Diff)</th>
+                                    <th>Mean Arterial Pressure (MAP)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in math_ops.bp_table %}
+                                    <tr>
+                                        <td>{{ row.systolic }}</td>
+                                        <td>{{ row.diastolic }}</td>
+                                        <td class="fw-bold">{{ row.pulse_pressure }}</td>
+                                        <td class="text-teal fw-bold">{{ row.mean_arterial_pressure }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <small class="text-muted">Formula: <code>MAP = Diastolic + (1/3 * Pulse Pressure)</code></small>
+                </div>
+            </div>
+        </div>
+
+        <!-- D. Linear Algebra (Unit 1) -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title mb-0 fw-bold text-navy">
+                        <i class="bi bi-diagram-3 text-info me-2"></i>D. Linear Algebra (Matrices & Eigenvalues)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">Matrix operations on clinical biomarker transition matrix: Determinant, Dot Product, Inverses, Eigenvalues.</p>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Determinant: <code>np.linalg.det(A)</code></label>
+                            <div class="p-2 bg-light rounded text-center fw-bold">{{ linalg.determinant }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Dot Product Risk Vector:</label>
+                            <div class="p-2 bg-light rounded text-center text-primary fw-bold">{{ linalg.dot_product_risk }}</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="form-label small fw-semibold">Computed Eigenvalues (Principal Variations):</label>
+                        <pre class="bg-light p-2 rounded small text-dark mb-0"><code>{{ linalg.eigenvalues }}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- E. Random Distributions -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white border-bottom py-3">
+            <h5 class="card-title mb-0 fw-bold text-navy">
+                <i class="bi bi-shuffle text-success me-2"></i>E. Random Distributions in Healthcare (Unit 1)
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Distribution</th>
+                            <th>Healthcare Domain Example</th>
+                            <th>Sample Mean</th>
+                            <th>Sample Std</th>
+                            <th>Range [Min, Max]</th>
+                            <th>Sample Generated Observations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold">Normal (Gaussian)</td>
+                            <td>Patient Heart Rates (bpm)</td>
+                            <td>{{ distributions.normal_heart_rate.mean|floatformat:2 }}</td>
+                            <td>{{ distributions.normal_heart_rate.std|floatformat:2 }}</td>
+                            <td>[{{ distributions.normal_heart_rate.min|floatformat:1 }}, {{ distributions.normal_heart_rate.max|floatformat:1 }}]</td>
+                            <td><code>{{ distributions.normal_heart_rate.sample }}</code></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Uniform</td>
+                            <td>Patient Demographics Age (years)</td>
+                            <td>{{ distributions.uniform_age.mean|floatformat:2 }}</td>
+                            <td>{{ distributions.uniform_age.std|floatformat:2 }}</td>
+                            <td>[{{ distributions.uniform_age.min|floatformat:1 }}, {{ distributions.uniform_age.max|floatformat:1 }}]</td>
+                            <td><code>{{ distributions.uniform_age.sample }}</code></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Binomial</td>
+                            <td>Binary Cardiac Outcome (0/1)</td>
+                            <td>{{ distributions.binomial_positive_outcome.mean|floatformat:2 }}</td>
+                            <td>{{ distributions.binomial_positive_outcome.std|floatformat:2 }}</td>
+                            <td>[{{ distributions.binomial_positive_outcome.min|floatformat:0 }}, {{ distributions.binomial_positive_outcome.max|floatformat:0 }}]</td>
+                            <td><code>{{ distributions.binomial_positive_outcome.sample }}</code></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Poisson</td>
+                            <td>Emergency Admissions per Hour</td>
+                            <td>{{ distributions.poisson_emergency_admissions.mean|floatformat:2 }}</td>
+                            <td>{{ distributions.poisson_emergency_admissions.std|floatformat:2 }}</td>
+                            <td>[{{ distributions.poisson_emergency_admissions.min|floatformat:0 }}, {{ distributions.poisson_emergency_admissions.max|floatformat:0 }}]</td>
+                            <td><code>{{ distributions.poisson_emergency_admissions.sample }}</code></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Exponential</td>
+                            <td>ICU Survival Time (days)</td>
+                            <td>{{ distributions.exponential_survival_time.mean|floatformat:2 }}</td>
+                            <td>{{ distributions.exponential_survival_time.std|floatformat:2 }}</td>
+                            <td>[{{ distributions.exponential_survival_time.min|floatformat:1 }}, {{ distributions.exponential_survival_time.max|floatformat:1 }}]</td>
+                            <td><code>{{ distributions.exponential_survival_time.sample }}</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

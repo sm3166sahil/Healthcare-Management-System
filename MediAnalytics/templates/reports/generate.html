@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Generate Analytical Report - MediAnalytics{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-navy mb-1"><i class="bi bi-file-earmark-plus text-teal me-2"></i>Generate Analytical Report</h2>
+            <p class="text-muted mb-0">Compile clinical metrics, descriptive statistics, and metadata into downloadable PDF or CSV summaries</p>
+        </div>
+        <a href="{% url 'reports:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back to Reports
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title mb-0 fw-bold text-navy">
+                        <i class="bi bi-gear text-primary me-2"></i>Report Compilation Settings
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Title -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Report Document Title:</label>
+                            <input type="text" name="title" class="form-control" value="Cardiovascular Clinical Analytics Report" required>
+                            <div class="form-text">A descriptive title printed at the top of the generated document.</div>
+                        </div>
+
+                        <!-- Dataset -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Target Healthcare Dataset:</label>
+                            <select name="dataset_id" class="form-select">
+                                <option value="">-- Synthetic Clinical Baseline --</option>
+                                {% for ds in datasets %}
+                                    <option value="{{ ds.id }}">{{ ds.title }} ({{ ds.row_count|default:"?" }} rows)</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Descriptive statistics from this dataset will be calculated and embedded into the report.</div>
+                        </div>
+
+                        <!-- Report Type -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Output Document Format:</label>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-check p-3 border rounded-3 bg-light">
+                                        <input class="form-check-input" type="radio" name="report_type" id="typePdf" value="PDF" checked>
+                                        <label class="form-check-label fw-bold text-navy" for="typePdf">
+                                            <i class="bi bi-file-pdf text-danger me-2"></i>PDF Analytical Document
+                                        </label>
+                                        <div class="small text-muted mt-1">Formatted ReportLab PDF with metadata tables, descriptive statistics, and academic disclaimers.</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check p-3 border rounded-3 bg-light">
+                                        <input class="form-check-input" type="radio" name="report_type" id="typeCsv" value="CSV">
+                                        <label class="form-check-label fw-bold text-navy" for="typeCsv">
+                                            <i class="bi bi-file-earmark-spreadsheet text-success me-2"></i>CSV Summary Matrix
+                                        </label>
+                                        <div class="small text-muted mt-1">Structured CSV file exporting means, medians, standard deviations, and metric ranges.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Executive Summary Text -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Executive Clinical Summary / Abstract:</label>
+                            <textarea name="summary" class="form-control" rows="4" placeholder="Enter findings, observational context, or analytical interpretation...">Exploratory data analysis of synthetic cardiovascular observation records reveals characteristic biomarker distributions. Cardiac troponin and CK-MB levels demonstrate significant variance among stratified outcome classifications. Correlation does not imply causation.</textarea>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'reports:list' %}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-check-circle me-1"></i> Generate &amp; Compile Report
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
